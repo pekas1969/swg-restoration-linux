@@ -6,6 +6,11 @@ The project aims to simplify the setup process by automating the installation of
 
 The installer is designed to support multiple Linux distributions, including openSUSE, Debian-based distributions, Fedora, and Arch Linux.
 
+
+> **Beta release:** This installer is currently in beta testing. It has been tested successfully by the author on the supported Linux distribution families listed below. However, Linux environments vary widely in terms of hardware, graphics drivers, package versions, Wine configurations, and desktop environments. Therefore, successful operation cannot be guaranteed on every system.
+
+> Bug reports and feedback are welcome. Please use the [GitHub Issues page](https://github.com/pekas1969/swg-restoration-linux/issues) to report problems or suggest improvements.
+
 ## Features
 
 - Automatic detection of supported Linux distribution families
@@ -56,7 +61,7 @@ The installer includes package-management support for the following distribution
 
 ### 1. Download the installer
 
-Download [`SWG_Restoration_Installer.sh`](https://raw.githubusercontent.com/pekas69/swg-restoration-linux/main/SWG_Restoration_Installer.sh) directly from GitHub.
+Download [`SWG_Restoration_Installer.sh`](https://github.com/pekas1969/swg-restoration-linux) directly from GitHub.
 
 You do not need to clone or download the entire repository. The installer automatically downloads the additional resources it needs, including the application icon and desktop launcher template, and copies them to their appropriate locations.
 
@@ -166,10 +171,6 @@ Star Wars Galaxies Restoration and its associated game assets remain the propert
 
 ## Contributing
 
-Contributions, bug reports, and suggestions for improvements are welcome.
-
-For bug reports, please see [Support and Bug Reports](https://chatgpt.com/c/6acba3e9-668c-83ed-acd5-5c13d6c4ba46#support-and-bug-reports).
-
 When contributing code, please retain the existing copyright notices and MIT License terms.
 
 ## License
@@ -179,7 +180,6 @@ This project is licensed under the [MIT License](https://chatgpt.com/c/LICENSE).
 You are free to use, copy, modify, distribute, sublicense, and sell this software, provided that the original copyright notice and the license text are retained.
 
 Original author: [pekas1969](https://github.com/pekas1969).
-
 
 ***May the Force be with you!***
 
