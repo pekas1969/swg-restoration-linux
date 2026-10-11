@@ -1,5 +1,14 @@
-
 #!/usr/bin/env bash
+#
+# Display project information and license
+printf '\n'
+printf 'Star Wars Galaxies Restoration - Linux Installer\n'
+printf 'Copyright (c) 2026 pekas1969\n'
+printf 'Licensed under the MIT License: https://github.com/pekas69/swg-restoration-linux/blob/main/LICENSE\n'
+
+# Clickable GitHub profile link in terminals supporting OSC 8
+printf 'Original author: \033]8;;https://github.com/pekas1969\033\\pekas1969\033]8;;\033\\\n'
+printf '\n'
 #
 # SWG Restoration Installer
 # Version 0.2
@@ -336,7 +345,231 @@ winetricks -q windowmanagermanaged=y ||
 log "Wine configuration completed."
 
 # ------------------------------------------------------------
-# Step 8: Download the official SWG Restoration installer
+# Step 8: Download and install necessary files
+# ------------------------------------------------------------
+
+
+# GitHub repository containing the additional installation files.
+readonly REPO_RAW_BASE="https://raw.githubusercontent.com/pekas1969/swg-restoration-linux/main/installer/install"
+
+download_asset() {
+    local url="$1"
+    local destination="$2"
+
+    if command -v curl >/dev/null 2>&1; then
+        curl --fail --location --retry 3 \
+            --output "$destination" "$url" ||
+            die "Failed to download: $url"
+    elif command -v wget >/dev/null 2>&1; then
+        wget --tries=3 \
+            --output-document="$destination" "$url" ||
+            die "Failed to download: $url"
+    else
+        die "Neither curl nor wget is available."
+    fi
+}
+
+
+configure_game_files() {
+    local game_dir="${PREFIX_PATH}/drive_c/SWG Restoration"
+    local options_file="${game_dir}/options.cfg"
+    local user_file="${game_dir}/user.cfg"
+    local desktop_template="${DOWNLOAD_DIR}/SWG_Restoration.desktop.template"
+    local desktop_file="${HOME}/SWG_Restoration.desktop"
+    local choice
+
+    log "Configuring SWG Restoration..."
+
+    [[ -d "$game_dir" ]] ||
+        die "Game directory not found: $game_dir"
+
+    # Update or create user.cfg without duplicating the setting.
+    ensure_multiple_instances_setting() {
+        local cfg="$1"
+        local tmp
+
+        tmp=$(mktemp) ||
+            die "Could not create a temporary configuration file."
+
+        awk '
+        BEGIN {
+            in_section = 0
+            found_section = 0
+            setting_written = 0
+        }
+
+        /^\[[^]]+\][[:space:]]*$/ {
+            if (in_section && !setting_written) {
+                print "allowMultipleInstances=true"
+                setting_written = 1
+            }
+
+            in_section = ($0 ~ /^\[SwgClient\][[:space:]]*$/)
+
+            if (in_section)
+                found_section = 1
+
+            print
+            next
+        }
+
+        in_section && /^[[:space:]]*allowMultipleInstances[[:space:]]*=/ {
+            if (!setting_written) {
+                print "allowMultipleInstances=true"
+                setting_written = 1
+            }
+            next
+        }
+
+        { print }
+
+        END {
+            if (in_section && !setting_written) {
+                print "allowMultipleInstances=true"
+                setting_written = 1
+            }
+
+            if (!found_section) {
+                print ""
+                print "[SwgClient]"
+                print "allowMultipleInstances=true"
+            }
+        }
+        ' "$cfg" > "$tmp" || {
+            rm -f "$tmp"
+            die "Failed to update $cfg."
+        }
+
+        cat "$tmp" > "$cfg" || {
+            rm -f "$tmp"
+            die "Failed to write $cfg."
+        }
+
+        rm -f "$tmp"
+    }
+
+    printf '\n'
+    printf '%s\n' "Multiple client instances configuration"
+    printf '%s\n' "----------------------------------------"
+
+    if [[ -f "$user_file" ]]; then
+        printf '1) Replace user.cfg with options.cfg and enable multiple instances.\n'
+        printf '2) Keep the existing user.cfg and update its multiple-instance setting.\n'
+        printf '3) Leave user.cfg unchanged and continue.\n'
+    else
+        printf '1) Create user.cfg from options.cfg and enable multiple instances.\n'
+        printf '2) Unavailable: no existing user.cfg was found.\n'
+        printf '3) Leave user.cfg uncreated and continue.\n'
+    fi
+
+    while true; do
+        printf '\n'
+        read -r -n 1 -p "Choose [1-3]: " choice
+        printf '\n'
+
+        case "$choice" in
+            1)
+                [[ -f "$options_file" ]] ||
+                    die "options.cfg not found: $options_file"
+
+                cp "$options_file" "$user_file" ||
+                    die "Failed to copy options.cfg to user.cfg."
+
+                ensure_multiple_instances_setting "$user_file"
+
+                log "user.cfg created from options.cfg."
+                log "Multiple client instances enabled."
+                break
+                ;;
+
+            2)
+                if [[ ! -f "$user_file" ]]; then
+                    warn "No existing user.cfg is available to modify."
+                    continue
+                fi
+
+                ensure_multiple_instances_setting "$user_file"
+
+                log "Existing user.cfg updated."
+                log "Multiple client instances enabled."
+                break
+                ;;
+
+            3)
+                warn "user.cfg was left unchanged."
+
+                printf '\n'
+                printf '%s\n' \
+                    "Multiple client instances may not work unless user.cfg contains:"
+                printf '\n'
+                printf '%s\n' \
+                    '[SwgClient]' \
+                    'allowMultipleInstances=true'
+                printf '\n'
+
+                read -r -n 1 -s -p "Press any key to continue..."
+                printf '\n'
+                break
+                ;;
+
+            *)
+                warn "Invalid choice. Please select 1, 2 or 3."
+                ;;
+        esac
+    done
+
+    # Download the game icon.
+    download_asset \
+        "${REPO_RAW_BASE}/Resto_Icon.png" \
+        "${game_dir}/Resto_Icon.png"
+
+    # Download the launcher and make it executable.
+    download_asset \
+        "${REPO_RAW_BASE}/Start_SWG_Restoration.sh" \
+        "${game_dir}/Start_SWG_Restoration.sh"
+
+    chmod +x "${game_dir}/Start_SWG_Restoration.sh" ||
+        die "Failed to make the launcher executable."
+
+    log "Game icon and launcher installed."
+
+    # Download and personalize the desktop entry.
+    download_asset \
+        "${REPO_RAW_BASE}/SWG_Restoration.desktop" \
+        "$desktop_template"
+
+    sed "s|/home/<username>|${HOME}|g" \
+        "$desktop_template" > "$desktop_file" ||
+        die "Failed to create the desktop entry."
+
+    chmod +x "$desktop_file" ||
+        die "Failed to make the desktop entry executable."
+
+    log "Desktop entry created: $desktop_file"
+
+    # Installation summary.
+    printf '\n\033[1;36m'
+    printf '%s\n' "=============================================="
+    printf '%s\n' " SWG Restoration setup completed"
+    printf '%s\n' "=============================================="
+    printf '\033[0m'
+
+    printf '\nGame installation directory:\n  %s\n' "$game_dir"
+    printf '\nLauncher:\n  %s\n' "${game_dir}/Start_SWG_Restoration.sh"
+    printf 'Start the game with the launcher above.\n'
+
+    printf '\nDesktop entry:\n  %s\n' "$desktop_file"
+    printf 'Use it to launch the game, or copy it elsewhere.\n'
+
+    printf '\nFor automatic splitscreen/dualbox setup, see:\n'
+    printf '%s\n' \
+        "https://github.com/pekas1969/swg-restoration-linux/tree/main/splitscreen-setup"
+
+    printf '\n'
+}
+
+# ------------------------------------------------------------
+# Step 9: Download the official SWG Restoration installer
 # ------------------------------------------------------------
 
 mkdir -p "$DOWNLOAD_DIR" ||
@@ -361,8 +594,9 @@ fi
 
 log "Download completed successfully."
 
+
 # ------------------------------------------------------------
-# Step 9: Launch the SWG Restoration installer
+# Step 10: Launch the SWG Restoration installer
 # ------------------------------------------------------------
 
 log "Starting the SWG Restoration installer."
@@ -371,8 +605,17 @@ log "Follow the instructions in the installer window."
 wine "$INSTALLER_FILE" ||
     die "The SWG Restoration installer exited with an error."
 
+    log "The SWG Restoration installer has closed."
+
 # ------------------------------------------------------------
-# Step 10: Finish
+# Step 11: Configure a last few thing
+# ------------------------------------------------------------
+
+configure_game_files
+
+log "Files downloaded and installed."
+# ------------------------------------------------------------
+# Step 11: Finish
 # ------------------------------------------------------------
 
 log "The SWG Restoration installer has closed."
