@@ -2,7 +2,7 @@
 #
 # Display project information and license
 printf '\n'
-printf 'Star Wars Galaxies Restoration - Linux Installer\n'
+printf 'Star Wars Galaxies Restoration - Unofficial Linux Installer\n'
 printf 'Copyright (c) 2026 pekas1969\n'
 printf 'Licensed under the MIT License: https://github.com/pekas69/swg-restoration-linux/blob/main/LICENSE\n'
 
@@ -582,7 +582,7 @@ configure_game_files() {
 
     # Download and personalize the desktop entry.
     download_asset \
-        "${REPO_RAW_BASE}/SWG_Restoration.desktop.template" \
+        "${REPO_RAW_BASE}/SWG_Restoration.desktop" \
         "$desktop_template"
 
     sed "s|/home/<username>|${HOME}|g" \
@@ -624,22 +624,22 @@ mkdir -p "$DOWNLOAD_DIR" ||
 
 log "Downloading the official SWG Restoration installer..."
 
-#if command_exists curl; then
-#    curl --fail --location --retry 3 \
-#        --output "$INSTALLER_FILE" \
-#        "$INSTALLER_URL" ||
-#        die "Failed to download the SWG Restoration installer."
-#else
-#    wget --tries=3 \
-#        --output-document="$INSTALLER_FILE" \
-#        "$INSTALLER_URL" ||
-#        die "Failed to download the SWG Restoration installer."
-#fi
+if command_exists curl; then
+    curl --fail --location --retry 3 \
+        --output "$INSTALLER_FILE" \
+        "$INSTALLER_URL" ||
+        die "Failed to download the SWG Restoration installer."
+else
+    wget --tries=3 \
+        --output-document="$INSTALLER_FILE" \
+        "$INSTALLER_URL" ||
+        die "Failed to download the SWG Restoration installer."
+fi
 
-#[[ -s "$INSTALLER_FILE" ]] ||
-#    die "The downloaded installer is missing or empty."
-#
-#log "Download completed successfully."
+[[ -s "$INSTALLER_FILE" ]] ||
+    die "The downloaded installer is missing or empty."
+
+log "Download completed successfully."
 
 
 # ------------------------------------------------------------
