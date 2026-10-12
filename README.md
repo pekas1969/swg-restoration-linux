@@ -61,7 +61,7 @@ The installer includes package-management support for the following distribution
 
 ### 1. Download the installer
 
-Download [`SWG_Restoration_Installer.sh`](https://github.com/pekas1969/swg-restoration-linux) directly from GitHub.
+Download [`SWG_Restoration_Installer.sh`](https://github.com/pekas1969/swg-restoration-linux/installer/SWG_Restoration_Installer.sh) directly from GitHub.
 
 You do not need to clone or download the entire repository. The installer automatically downloads the additional resources it needs, including the application icon and desktop launcher template, and copies them to their appropriate locations.
 
