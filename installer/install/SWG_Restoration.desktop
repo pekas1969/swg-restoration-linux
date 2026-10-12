@@ -1,5 +1,5 @@
 [Desktop Entry]
-Exec="/home/<username>/.swgrestoration/drive_c/SWG Restoration/Start_SWG_Restoration.sh"
+Exec=env WINEPREFIX=/home/<username>/.swgrestoration wine "/home/<username>/.swgrestoration/drive_c/SWG Restoration.exe"
 Type=Application
 StartupNotify=true
 Comment=SWG Restoration Launcher
