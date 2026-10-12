@@ -1,11 +1,11 @@
-# Star Wars Galaxies Restoration – Linux Installer
+# Star Wars Galaxies Restoration – Unofficial Linux Installer
+version: 0.9.0-beta.2
 
 A community-maintained installer to help Linux users install and run **Star Wars Galaxies Restoration** using Wine.
 
 The project aims to simplify the setup process by automating the installation of required system packages, creating a dedicated 64-bit Wine prefix, configuring Windows compatibility components, and launching the official SWG Restoration installer.
 
 The installer is designed to support multiple Linux distributions, including openSUSE, Debian-based distributions, Fedora, and Arch Linux.
-
 
 > **Beta release:** This installer is currently in beta testing. It has been tested successfully by the author on the supported Linux distribution families listed below. However, Linux environments vary widely in terms of hardware, graphics drivers, package versions, Wine configurations, and desktop environments. Therefore, successful operation cannot be guaranteed on every system.
 
@@ -180,6 +180,8 @@ This project is licensed under the [MIT License](https://chatgpt.com/c/LICENSE).
 You are free to use, copy, modify, distribute, sublicense, and sell this software, provided that the original copyright notice and the license text are retained.
 
 Original author: [pekas1969](https://github.com/pekas1969).
+
+Ingame Name(s): Rayst Bakhar (Aline | Bridget)
 
 ***May the Force be with you!***
 
