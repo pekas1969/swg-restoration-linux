@@ -1,8 +1,0 @@
-[Desktop Entry]
-Exec="/home/<username>/.swgrestoration/drive_c/SWG Restoration/Start_SWG_Restoration.sh"
-Type=Application
-StartupNotify=true
-Comment=SWG Restoration Launcher
-Path=/home/<username>/.swgrestoration/drive_c/SWG Restoration
-Icon=/home/<username>/.swgrestoration/drive_c/SWG Restoration/Resto_Icon.png
-

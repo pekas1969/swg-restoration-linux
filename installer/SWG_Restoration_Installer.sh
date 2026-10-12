@@ -8,6 +8,7 @@ printf 'Licensed under the MIT License: https://github.com/pekas69/swg-restorati
 
 # Clickable GitHub profile link in terminals supporting OSC 8
 printf 'Original author: \033]8;;https://github.com/pekas1969\033\\pekas1969\033]8;;\033\\\n'
+printf 'Ingame Name(s) : Rayst Bakhar (Aline | Bridget)\n'
 printf '\n'
 #
 # SWG Restoration Installer
@@ -31,6 +32,7 @@ readonly PREFIX_PATH="${HOME}/.swgrestoration"
 readonly DOWNLOAD_DIR="${HOME}/.cache/swgrestoration"
 readonly INSTALLER_FILE="${DOWNLOAD_DIR}/SWG Restoration Install.exe"
 readonly INSTALLER_URL="https://patch.swgr.media/patch/launcher/SWG%20Restoration%20Install.exe"
+readonly REPO_RAW_BASE="raw.githubusercontent.com/pekas1969/swg-restoration-linux/master/installer/install"
 
 # ------------------------------------------------------------
 # General functions
@@ -350,14 +352,13 @@ log "Wine configuration completed."
 
 
 # GitHub repository containing the additional installation files.
-readonly REPO_RAW_BASE="https://raw.githubusercontent.com/pekas1969/swg-restoration-linux/main/installer/install"
 
 download_asset() {
     local url="$1"
-    local destination="$2"
+    local destination="$2"#
 
     if command -v curl >/dev/null 2>&1; then
-        curl --fail --location --retry 3 \
+            curl --fail --location --retry 3 \
             --output "$destination" "$url" ||
             die "Failed to download: $url"
     elif command -v wget >/dev/null 2>&1; then
@@ -377,6 +378,52 @@ configure_game_files() {
     local desktop_template="${DOWNLOAD_DIR}/SWG_Restoration.desktop.template"
     local desktop_file="${HOME}/SWG_Restoration.desktop"
     local choice
+
+    # First launcher startup and initial game setup
+    clear
+    echo
+    echo "============================================================"
+    echo " Initial Launcher Setup"
+    echo "============================================================"
+    echo
+    echo "It is now time to start the launcher and download the missing game data."
+    echo
+    echo "If you already have an account, log in."
+    echo "Otherwise, register at https://swgr.org"
+    echo
+    echo "Log in to the launcher and let it download and install the required updates."
+    echo
+    echo "Follow these steps:"
+    echo
+    echo "  1. Click Play once. The updater will check all required components and download any missing files."
+    echo
+    echo "  2. Click Play again to open the Game Settings."
+    echo "     Switch to the Graphics tab and enable:"
+    echo "       - Windowed Mode"
+    echo "       - Borderless Window"
+    echo
+    echo "  3. Close the settings window, then click Save in both the launcher"
+    echo "     settings and the Game Settings."
+    echo
+    echo "  4. Do NOT start the game yet! Exit the launcher completely."
+    echo
+    echo "Press any key to start the launcher"
+    read -r
+    echo
+    echo
+    echo "Starting SWG Restoration.exe..."
+    echo "Please wait until the process has finished."
+    echo
+
+    # Start the launcher executable and wait for it to exit
+    (
+        cd "$game_dir" || exit 1
+        wine "SWG Restoration.exe"
+    )
+
+    echo
+    echo "Press any key to continue after the launcher has finished all updates, all game settings are set and the launcher has been closed"
+    read -r
 
     log "Configuring SWG Restoration..."
 
@@ -535,7 +582,7 @@ configure_game_files() {
 
     # Download and personalize the desktop entry.
     download_asset \
-        "${REPO_RAW_BASE}/SWG_Restoration.desktop" \
+        "${REPO_RAW_BASE}/SWG_Restoration.desktop.template" \
         "$desktop_template"
 
     sed "s|/home/<username>|${HOME}|g" \
@@ -561,11 +608,11 @@ configure_game_files() {
     printf '\nDesktop entry:\n  %s\n' "$desktop_file"
     printf 'Use it to launch the game, or copy it elsewhere.\n'
 
-    printf '\nFor automatic splitscreen/dualbox setup, see:\n'
-    printf '%s\n' \
-        "https://github.com/pekas1969/swg-restoration-linux/tree/main/splitscreen-setup"
+    #printf '\nFor automatic splitscreen/dualbox setup, see:\n'
+    #printf '%s\n' \
+    #    "https://github.com/pekas1969/swg-restoration-linux/tree/main/splitscreen-setup"
 
-    printf '\n'
+    #printf '\n'
 }
 
 # ------------------------------------------------------------
@@ -577,22 +624,22 @@ mkdir -p "$DOWNLOAD_DIR" ||
 
 log "Downloading the official SWG Restoration installer..."
 
-if command_exists curl; then
-    curl --fail --location --retry 3 \
-        --output "$INSTALLER_FILE" \
-        "$INSTALLER_URL" ||
-        die "Failed to download the SWG Restoration installer."
-else
-    wget --tries=3 \
-        --output-document="$INSTALLER_FILE" \
-        "$INSTALLER_URL" ||
-        die "Failed to download the SWG Restoration installer."
-fi
+#if command_exists curl; then
+#    curl --fail --location --retry 3 \
+#        --output "$INSTALLER_FILE" \
+#        "$INSTALLER_URL" ||
+#        die "Failed to download the SWG Restoration installer."
+#else
+#    wget --tries=3 \
+#        --output-document="$INSTALLER_FILE" \
+#        "$INSTALLER_URL" ||
+#        die "Failed to download the SWG Restoration installer."
+#fi
 
-[[ -s "$INSTALLER_FILE" ]] ||
-    die "The downloaded installer is missing or empty."
-
-log "Download completed successfully."
+#[[ -s "$INSTALLER_FILE" ]] ||
+#    die "The downloaded installer is missing or empty."
+#
+#log "Download completed successfully."
 
 
 # ------------------------------------------------------------
@@ -603,7 +650,7 @@ log "Starting the SWG Restoration installer."
 log "Follow the instructions in the installer window."
 
 wine "$INSTALLER_FILE" ||
-    die "The SWG Restoration installer exited with an error."
+    #die "The SWG Restoration installer exited with an error."
 
     log "The SWG Restoration installer has closed."
 
